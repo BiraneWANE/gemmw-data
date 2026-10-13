@@ -1,0 +1,26 @@
+name: Collecte hebdomadaire
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"   # lundi 06:17 UTC
+  workflow_dispatch:
+
+jobs:
+  collecte:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installer
+        run: uv sync
+      - name: Relever les prix concurrents
+        run: uv run gemmw collecte --sortie data/brut
+      - name: Conserver le relevé
+        uses: actions/upload-artifact@v4
+        with:
+          name: releve-${{ github.run_id }}
+          path: data/brut/
+          retention-days: 90

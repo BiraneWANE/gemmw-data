@@ -1,0 +1,59 @@
+[project]
+name = "gemmw-data"
+version = "0.1.0"
+description = "Collecte, entrepôt, tableau de bord et générateur de livrets pour Gem'MW Éditions"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Birane WANE" }]
+dependencies = [
+    "requests>=2.32",
+    "beautifulsoup4>=4.12",
+    "pandas>=2.2",
+    "pydantic-settings>=2.4",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dashboard = ["streamlit>=1.38", "plotly>=5.24"]
+modeles = ["scikit-learn>=1.5", "mlflow>=2.16"]
+api = ["fastapi>=0.115", "uvicorn>=0.30", "pymupdf>=1.24"]
+qualite = ["great-expectations>=1.0"]
+
+[project.scripts]
+gemmw = "gemmw.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "pre-commit>=3.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gemmw"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "S", "SIM"]
+ignore = ["S101"]  # assert dans les tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["gemmw"]
