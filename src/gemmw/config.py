@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     db_path: Path = Path("data/gemmw.db")
     user_agent: str = "gemmw-data/0.1 (+https://github.com/BiraneWANE/gemmw-data)"
     delai_entre_requetes_s: float = 2.0
+    # Sel du hachage des emails d'acheteuses. À définir dans .env, jamais dans le dépôt.
+    sel_acheteuses: str = ""
 
 
 settings = Settings()
