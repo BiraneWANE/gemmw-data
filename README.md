@@ -6,7 +6,7 @@ Ce dépôt contient tout ce qui tourne autour de la boutique sans être la bouti
 
 ## Ce que ça fait aujourd'hui
 
-- **Collecte** : chaque lundi, une action GitHub relève les prix des livrets concurrents (boutiques WooCommerce) et archive le relevé. `gemmw collecte`
+- **Collecte** : chaque lundi, une action GitHub relève les prix des livrets concurrents (boutiques WooCommerce) et archive le relevé. `uv run python -m gemmw.cli collecte`
 - **Entrepôt** : un schéma SQLite (PostgreSQL plus tard, même schéma) pour l'historique des prix et les ventes, sans aucune donnée personnelle en clair.
 - **Qualité** : lint (ruff), tests (pytest), secrets (gitleaks), le tout rejoué à chaque push.
 
@@ -31,7 +31,7 @@ cd gemmw-data
 cp .env.example .env
 make install        # uv sync + hooks pre-commit
 make test
-make collecte       # écrit data/brut/releve-AAAA-MM-JJ.jsonl
+uv run python -m gemmw.cli collecte   # écrit data/brut/releve-AAAA-MM-JJ.jsonl
 ```
 
 Prérequis : Python 3.12 et [uv](https://docs.astral.sh/uv/).

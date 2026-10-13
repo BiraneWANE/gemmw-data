@@ -47,3 +47,6 @@ terraform.tfvars
 .idea/
 .DS_Store
 Thumbs.db
+
+# Pages brutes téléchargées pour analyse (les fixtures allégées, elles, sont versionnées)
+tests/fixtures/reel/

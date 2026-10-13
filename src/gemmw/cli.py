@@ -21,3 +21,7 @@ def version() -> None:
     from gemmw import __version__
 
     typer.echo(__version__)
+
+
+if __name__ == "__main__":
+    app()

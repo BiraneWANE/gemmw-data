@@ -12,7 +12,7 @@ test:
 	uv run pytest --cov
 
 collecte:
-	uv run gemmw collecte
+	uv run python -m gemmw.cli collecte
 
 dashboard:
 	uv run streamlit run src/gemmw/tableau_de_bord/app.py

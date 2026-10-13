@@ -17,7 +17,7 @@ jobs:
       - name: Installer
         run: uv sync
       - name: Relever les prix concurrents
-        run: uv run gemmw collecte --sortie data/brut
+        run: uv run python -m gemmw.cli collecte --sortie data/brut
       - name: Conserver le relevé
         uses: actions/upload-artifact@v4
         with:
