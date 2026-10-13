@@ -53,6 +53,6 @@ docs/decisions/    une décision d'architecture par fichier
 
 ## Auteur
 
-Birane WANE, architecte IA et concepteur développeur en science des données (RNCP 41993 et 35288). Le projet sert une vraie boutique, la mienne et celle de ma femme, ce qui change tout : chaque brique existe parce qu'une question concrète l'a demandée.
+Birane WANE, architecte IA et concepteur développeur en science des données (RNCP 41993 et 35288). Le projet sert une vraie boutique, celle d'une cliente, ce qui change tout : chaque brique existe parce qu'une question concrète l'a demandée.
 
 Licence MIT pour le code. Les livrets, les visuels et la marque Gem'MW restent la propriété de Gem'MW Éditions.
