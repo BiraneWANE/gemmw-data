@@ -8,18 +8,18 @@ Ce dépôt contient tout ce qui tourne autour de la boutique sans être la bouti
 
 - **Collecte** : chaque lundi, une action GitHub relève les prix des livrets concurrents (boutiques WooCommerce) et archive le relevé. `uv run python -m gemmw.cli collecte`
 - **Entrepôt** : un schéma SQLite (PostgreSQL plus tard, même schéma) pour l'historique des prix et les ventes, sans aucune donnée personnelle en clair.
+- **Import des ventes** : exports Payhip et Etsy vers l'entrepôt, emails hachés, neuf contrôles d'entrée. `uv run python -m gemmw.cli importer <export.csv> --plateforme payhip|etsy`
+- **Tableau de bord** : ventes, marge nette après frais et TVA, et position de Gem'MW face aux prix concurrents. `uv run streamlit run src/gemmw/tableau_de_bord/app.py`
 - **Qualité** : lint (ruff), tests (pytest), secrets (gitleaks), le tout rejoué à chaque push.
 
 ## Ce qui arrive, dans l'ordre
 
 | Étape | Quoi | Outils |
 |---|---|---|
-| 1 | Import des exports Payhip et Etsy dans l'entrepôt, contrôles d'entrée | pandas, Great Expectations |
-| 2 | Tableau de bord : ventes, marge nette réelle après frais et TVA, prix concurrents | Streamlit |
-| 3 | Générateur : un prénom entre, un PDF personnalisé sort, déclenché par la boutique | FastAPI, PyMuPDF, Docker |
-| 4 | Infrastructure décrite en code sur un petit VPS | Terraform, Caddy |
-| 5 | Prévision des ventes, segmentation des acheteuses | scikit-learn, MLflow |
-| 6 | Assistants : réponses aux clientes, idées de contenu, aide à la création | LLM via LiteLLM, compteur de coût par conversation |
+| 1 | Générateur : un prénom entre, un PDF personnalisé sort, déclenché par la boutique | FastAPI, PyMuPDF, Docker |
+| 2 | Infrastructure décrite en code sur un petit VPS | Terraform, Caddy |
+| 3 | Prévision des ventes, segmentation des acheteuses | scikit-learn, MLflow |
+| 4 | Assistants : réponses aux clientes, idées de contenu, aide à la création | LLM via LiteLLM, compteur de coût par conversation |
 
 Le détail des choix et de ce qui a été écarté (Spark, Kafka, Kubernetes…) est dans [ARCHITECTURE.md](ARCHITECTURE.md). Le traitement des données personnelles est dans [GOUVERNANCE.md](GOUVERNANCE.md). Les décisions, une par fichier, sont dans [docs/decisions/](docs/decisions/).
 
@@ -42,7 +42,7 @@ Prérequis : Python 3.12 et [uv](https://docs.astral.sh/uv/).
 src/gemmw/
   collecte/        relevé des prix concurrents, un extracteur par site
   entrepot/        schéma et accès à la base
-  tableau_de_bord/ l'application Streamlit (à venir)
+  tableau_de_bord/ l'application Streamlit et sa couche de lecture
   modeles/         prévision et segmentation (à venir)
   texte_image/     classement des commentaires, visuels (à venir)
   api/             le générateur de livrets (à venir)
