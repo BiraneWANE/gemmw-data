@@ -1,0 +1,12 @@
+.git
+.venv
+data
+livrets
+exports
+secrets
+.env
+.env.*
+*.pdf
+*.csv
+tests
+docs
