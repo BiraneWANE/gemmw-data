@@ -22,6 +22,8 @@ data/propre/*
 # Exports clients (emails d'acheteuses) : jamais en ligne
 exports/
 *.csv
+# Exception : jeux d'essai fictifs des tests (adresses @example.org, aucune vraie cliente)
+!tests/fixtures/**/*.csv
 
 # Python
 __pycache__/
