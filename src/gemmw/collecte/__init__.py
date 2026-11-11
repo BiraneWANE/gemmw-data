@@ -95,5 +95,16 @@ def lancer_collecte(sortie: Path) -> Path:
                 }
                 f.write(json.dumps(ligne, ensure_ascii=False) + "\n")
                 n += 1
+        from gemmw.collecte.etsy import collecter_etsy
+
+        for p in collecter_etsy(settings.etsy_api_key, settings.etsy_recherches):
+            ligne = {
+                "releve_le": horodatage.isoformat(),
+                "site": "Etsy",
+                "page": "api",
+                **p.__dict__,
+            }
+            f.write(json.dumps(ligne, ensure_ascii=False) + "\n")
+            n += 1
     log.info("%d lignes écrites dans %s", n, chemin)
     return chemin
