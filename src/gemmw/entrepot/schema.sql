@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS releve_prix (
 );
 CREATE INDEX IF NOT EXISTS idx_releve_site_date ON releve_prix (site, releve_le);
 
--- Ventes Gem'MW, importées des exports Payhip et Etsy. Aucune donnée personnelle :
--- l'acheteuse est réduite à un identifiant haché (voir GOUVERNANCE.md).
+-- Ventes Gem'MW, importées des exports Payhip et Etsy. Données pseudonymisées :
+-- l'acheteuse est réduite à un identifiant haché et salé (voir GOUVERNANCE.md).
 CREATE TABLE IF NOT EXISTS vente (
     id              INTEGER PRIMARY KEY,
     plateforme      TEXT NOT NULL CHECK (plateforme IN ('payhip', 'etsy', 'amazon', 'site')),
