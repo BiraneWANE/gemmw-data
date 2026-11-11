@@ -1,0 +1,5 @@
+{$DOMAINE} {
+	encode gzip
+	reverse_proxy generateur:8000
+	header -Server
+}

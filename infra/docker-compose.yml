@@ -1,0 +1,23 @@
+# Le générateur derrière Caddy, qui obtient et renouvelle seul le certificat HTTPS.
+# L'image est construite sur le serveur depuis le dépôt : pas de registre à gérer.
+services:
+  generateur:
+    build: ${DEPOT}
+    restart: unless-stopped
+    environment:
+      GEMMW_API_CLE: ${GEMMW_API_CLE}
+      GEMMW_LIVRETS_DIR: /livrets
+    volumes:
+      - /srv/gemmw/livrets:/livrets:ro
+    expose: ["8000"]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      DOMAINE: ${DOMAINE}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /srv/gemmw/caddy:/data
+    depends_on: [generateur]

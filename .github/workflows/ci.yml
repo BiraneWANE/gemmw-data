@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Installer
-        run: uv sync --group dev
+        run: uv sync --group dev --extra api
       - name: Lint
         run: |
           uv run ruff check .
@@ -29,3 +29,28 @@ jobs:
         with:
           name: coverage
           path: coverage.xml
+
+  image:
+    runs-on: ubuntu-latest
+    needs: qualite
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construire l'image du générateur
+        run: docker build -t gemmw-generateur .
+      - name: Vérifier qu'elle démarre
+        run: |
+          docker run -d --name g -p 8000:8000 -e GEMMW_API_CLE=essai gemmw-generateur
+          for i in $(seq 1 20); do curl -fs localhost:8000/sante && exit 0; sleep 1; done
+          docker logs g; exit 1
+
+  infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform (format et validation, sans compte Scaleway)
+        working-directory: infra/terraform
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false
+          terraform validate

@@ -1,0 +1,24 @@
+#cloud-config
+package_update: true
+packages: [ca-certificates, curl, git, unattended-upgrades]
+
+write_files:
+  - path: /opt/gemmw/docker-compose.yml
+    content: |
+      ${indent(6, compose)}
+  - path: /opt/gemmw/Caddyfile
+    content: |
+      ${indent(6, caddyfile)}
+  - path: /opt/gemmw/.env
+    permissions: "0600"
+    content: |
+      DOMAINE=${domaine}
+      DEPOT=${depot}
+      # Ajouter ici GEMMW_API_CLE=... après la création (jamais dans Terraform)
+
+runcmd:
+  - mkdir -p /srv/gemmw/livrets /srv/gemmw/caddy
+  - curl -fsSL https://get.docker.com | sh
+  - systemctl enable --now docker
+  - sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+  - systemctl reload ssh
