@@ -16,9 +16,44 @@ jobs:
           python-version: "3.12"
       - name: Installer
         run: uv sync
+
+      # data/brut n'est pas dans le dépôt : on récupère les relevés des semaines passées
+      # depuis le cache de GitHub Actions, pour pouvoir comparer.
+      - name: Récupérer les relevés précédents
+        uses: actions/cache/restore@v4
+        with:
+          path: data/brut
+          key: releves-${{ github.run_id }}
+          restore-keys: releves-
+
       - name: Relever les prix concurrents
-        run: uv run python -m gemmw.cli collecte --sortie data/brut
+        id: collecte
+        env:
+          GEMMW_ETSY_API_KEY: ${{ secrets.ETSY_API_KEY }}
+        run: |
+          uv run python -m gemmw.cli collecte --sortie data/brut
+          echo "fichier=data/brut/releve-$(date -u +%F).jsonl" >> "$GITHUB_OUTPUT"
+
+      - name: Contrôler la qualité du relevé
+        run: uv run python -m gemmw.cli controle-releve "${{ steps.collecte.outputs.fichier }}"
+
+      - name: Comparer au relevé précédent et alerter
+        env:
+          GEMMW_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GEMMW_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: >
+          uv run python -m gemmw.cli alerte "${{ steps.collecte.outputs.fichier }}"
+          --resume "$GITHUB_STEP_SUMMARY" --telegram
+
+      - name: Garder les relevés pour la semaine prochaine
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/brut
+          key: releves-${{ github.run_id }}
+
       - name: Conserver le relevé
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: releve-${{ github.run_id }}

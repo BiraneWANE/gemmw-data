@@ -56,6 +56,74 @@ def importer(
     )
 
 
+@app.command("controle-releve")
+def controle_releve(fichier: Path) -> None:
+    """Contrôle la qualité d'un relevé de prix. Code de sortie 1 si un contrôle échoue."""
+    from gemmw.collecte.qualite import controler_releve, lire_releve, tout_passe
+    from gemmw.collecte.sites import SITES
+
+    resultats = controler_releve(lire_releve(fichier), tuple(s.nom for s in SITES))
+    for r in resultats:
+        typer.echo(
+            f"  {'ok ' if r.succes else 'KO '} {r.attente}" + ("" if r.succes else f" ({r.detail})")
+        )
+    if not tout_passe(resultats):
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def alerte(
+    fichier: Path,
+    precedent: Path | None = typer.Option(  # noqa: B008
+        None, help="Relevé de référence (sinon le plus récent du dossier)"
+    ),
+    resume: Path | None = typer.Option(  # noqa: B008
+        None, help="Fichier où ajouter le rapport (ex. $GITHUB_STEP_SUMMARY)"
+    ),
+    telegram: bool = typer.Option(False, help="Envoyer le rapport sur Telegram si configuré"),
+) -> None:
+    """Compare un relevé au précédent et écrit ce qui a changé chez les concurrents."""
+    from gemmw.collecte.alerte import comparer, en_texte, envoyer_telegram, releve_precedent
+    from gemmw.collecte.qualite import lire_releve
+    from gemmw.config import settings
+
+    reference = precedent or releve_precedent(fichier.parent, fichier)
+    if reference is None:
+        typer.echo("Aucun relevé précédent : première collecte, pas de comparaison.")
+        return
+    rapport = comparer(lire_releve(reference), lire_releve(fichier))
+    texte = en_texte(rapport)
+    typer.echo(texte)
+    if resume:
+        with resume.open("a", encoding="utf-8") as f:
+            f.write("\n" + texte + "\n")
+    if telegram and not rapport.vide:
+        if settings.telegram_bot_token and settings.telegram_chat_id:
+            envoyer_telegram(texte, settings.telegram_bot_token, settings.telegram_chat_id)
+            typer.echo("Rapport envoyé sur Telegram.")
+        else:
+            typer.echo("Telegram non configuré : rapport non envoyé.")
+
+
+@app.command()
+def generer(livret: Path, prenom: str, sortie: Path | None = None) -> None:  # noqa: B008
+    """Écrit le prénom à la place des repères PRENOM d'un livret (test en local)."""
+    from gemmw.api.generateur import PrenomInvalide, compter_reperes, personnaliser
+
+    source = livret.read_bytes()
+    if compter_reperes(source) == 0:
+        typer.echo("Aucun repère PRENOM dans ce livret.")
+        raise typer.Exit(1)
+    try:
+        pdf = personnaliser(source, prenom)
+    except PrenomInvalide as e:
+        typer.echo(f"Prénom refusé : {e}")
+        raise typer.Exit(2) from e
+    cible = sortie or livret.with_name(f"{livret.stem}_{prenom.strip().lower()}.pdf")
+    cible.write_bytes(pdf)
+    typer.echo(f"Livret écrit : {cible}")
+
+
 @app.command()
 def version() -> None:
     from gemmw import __version__
