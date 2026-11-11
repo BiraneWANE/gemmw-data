@@ -39,9 +39,9 @@ jobs:
         run: docker build -t gemmw-generateur .
       - name: Vérifier qu'elle démarre
         run: |
-          docker run -d --name g -p 8000:8000 -e GEMMW_API_CLE=essai gemmw-generateur
+          docker run -d --name gemmw-essai -p 8000:8000 -e GEMMW_API_CLE=essai gemmw-generateur
           for i in $(seq 1 20); do curl -fs localhost:8000/sante && exit 0; sleep 1; done
-          docker logs g; exit 1
+          docker logs gemmw-essai; exit 1
 
   infra:
     runs-on: ubuntu-latest
