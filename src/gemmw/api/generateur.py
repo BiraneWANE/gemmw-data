@@ -104,6 +104,11 @@ def personnaliser(pdf: bytes, prenom: str) -> bytes:
             rgb = tuple(((couleur >> d) & 255) / 255 for d in (16, 8, 0))
             seul = not avant.strip() and not apres.strip()
             cadre = zone if seul or "bbox" not in span else pymupdf.Rect(span["bbox"])
+            if seul:
+                # On n'efface que la hauteur des capitales : un trait ou des pointillés juste
+                # sous le repère (ligne « Ce livret appartient à : ») restent visibles.
+                bas = float(span["origin"][1]) + 0.12 * float(span["size"])
+                cadre = pymupdf.Rect(cadre.x0, cadre.y0, cadre.x1, min(cadre.y1, bas))
             if id(span) in deja:
                 continue
             deja.add(id(span))
@@ -111,7 +116,9 @@ def personnaliser(pdf: bytes, prenom: str) -> bytes:
             texte = prenom if seul else span["text"].replace(REPERE, prenom)
             a_ecrire.append((cadre, float(span["size"]), rgb, span["origin"][1], texte, seul))
             total += span["text"].count(REPERE)
-        page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
+        page.apply_redactions(
+            images=pymupdf.PDF_REDACT_IMAGE_NONE, graphics=pymupdf.PDF_REDACT_LINE_ART_NONE
+        )
         milieu_page = (page.rect.x0 + page.rect.x1) / 2
         for cadre, taille, couleur, base, texte, seul in a_ecrire:
             centre = (cadre.x0 + cadre.x1) / 2

@@ -81,3 +81,20 @@ def test_fond_pris_autour_du_repere_et_pas_sur_le_texte():
     with pymupdf.open(stream=pdf, filetype="pdf") as doc:
         pix = doc[0].get_pixmap(clip=pymupdf.Rect(150, 302, 200, 306), dpi=72)
     assert all(abs(a - b) <= 2 for a, b in zip(pix.pixel(10, 1)[:3], (255, 249, 235), strict=True))
+
+
+def test_pointilles_sous_le_repere_gardes():
+    """Ligne « Ce livret appartient à : PRENOM » : les pointillés juste sous le repère restent."""
+    doc = pymupdf.open()
+    page = doc.new_page(width=595, height=842)
+    page.draw_rect(page.rect, color=None, fill=(1, 1, 1))
+    page.insert_text((100, 753.75), "Ce livret appartient à :", fontsize=19)
+    page.draw_rect(pymupdf.Rect(296, 756.8, 500, 758.2), color=None, fill=(0.6, 0.5, 0.4))
+    page.insert_text((360.7, 753.75), "PRENOM", fontsize=17)
+    sortie = personnaliser(doc.tobytes(), "Léa")
+    resultat = pymupdf.open(stream=sortie, filetype="pdf")[0]
+    assert "Léa" in resultat.get_text()
+    traits = [
+        d["rect"] for d in resultat.get_drawings() if d["rect"].y0 > 750 and d["rect"].width > 150
+    ]
+    assert traits, "les pointillés ont disparu"
