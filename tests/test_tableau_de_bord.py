@@ -41,3 +41,24 @@ def test_resume_ventes(tmp_path):
 
 def test_sans_base_resume_a_zero(tmp_path):
     assert resume_ventes(lire_ventes(tmp_path / "absente.db"))["commandes"] == 0
+
+
+def test_ventes_par_livret_toutes_boutiques(tmp_path):
+    from gemmw.catalogue import charger as charger_catalogue
+    from gemmw.entrepot import ouvrir
+    from gemmw.entrepot.ventes import charger, lire_site, rattacher_au_catalogue
+    from gemmw.tableau_de_bord.donnees import lire_ventes, ventes_par_livret
+
+    chemin = tmp_path / "gemmw.db"
+    conn = ouvrir(chemin)
+    fixtures = Path(__file__).parent / "fixtures" / "ventes"
+    charger(conn, lire_site(fixtures / "site_commandes.json", "sel"), "site")
+    rattacher_au_catalogue(conn, charger_catalogue())
+    conn.close()
+    tableau = ventes_par_livret(lire_ventes(chemin))
+    assert set(tableau["livret"]) == {
+        "Mes mots invariables avec Talo",
+        "Mon calendrier de l'Avent avec Talo",
+        "(à rattacher)",
+    }
+    assert tableau["commandes"].sum() == 3

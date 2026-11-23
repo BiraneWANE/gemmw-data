@@ -1,4 +1,4 @@
-"""Import des ventes depuis les exports CSV de Payhip et d'Etsy vers l'entrepôt.
+"""Import des ventes depuis les exports de Payhip, d'Etsy et de la boutique du site.
 
 Les deux plateformes exportent des fichiers de forme différente ; chacune a son lecteur qui
 ramène tout à un même tableau de ventes (une ligne par commande). L'email de l'acheteuse est
@@ -9,6 +9,7 @@ revient, on ne peut pas retrouver qui elle est (voir GOUVERNANCE.md).
 from __future__ import annotations
 
 import hashlib
+import json
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
@@ -100,7 +101,42 @@ def lire_etsy(chemin: Path, sel: str) -> pd.DataFrame:
     return ventes[COLONNES].dropna(subset=["prix_ttc_eur", "vendue_le"]).reset_index(drop=True)
 
 
-LECTEURS = {"payhip": lire_payhip, "etsy": lire_etsy}
+STATUTS_SITE_PAYES = {"completed", "processing"}
+
+
+def lire_site(chemin: Path, sel: str) -> pd.DataFrame:
+    """Commandes de la boutique WooCommerce (famillemw.fr), au format JSON de l'API REST.
+
+    Une ligne par commande payée. Les commandes à 0 € (livrets offerts, commandes d'essai
+    avec un code à 100 %) ne sont pas des ventes : elles sont écartées. Les produits sont
+    désignés par leur référence (SKU), la même que dans le catalogue commun.
+    """
+    commandes = json.loads(chemin.read_text(encoding="utf-8"))
+    lignes = []
+    for c in commandes:
+        total = float(c.get("total") or 0)
+        if c.get("status") not in STATUTS_SITE_PAYES or total <= 0:
+            continue
+        facturation = c.get("billing") or {}
+        skus = [li.get("sku") or str(li.get("product_id", "")) for li in c.get("line_items", [])]
+        lignes.append(
+            {
+                "plateforme": "site",
+                "commande_ref": str(c["id"]),
+                "vendue_le": str(c.get("date_paid") or c.get("date_created") or "")[:10],
+                "produit": "+".join(skus),
+                "prix_ttc_eur": total,
+                # Les frais Stripe et PayPal n'apparaissent pas dans la commande WooCommerce
+                "frais_eur": 0.0,
+                "tva_eur": round(float(c.get("total_tax") or 0), 2),
+                "acheteuse_hash": hacher_email(facturation.get("email", ""), sel),
+                "pays": facturation.get("country") or None,
+            }
+        )
+    return pd.DataFrame(lignes, columns=COLONNES)
+
+
+LECTEURS = {"payhip": lire_payhip, "etsy": lire_etsy, "site": lire_site}
 
 
 def charger(conn: sqlite3.Connection, ventes: pd.DataFrame, plateforme: str) -> RapportImport:
@@ -121,3 +157,31 @@ def charger(conn: sqlite3.Connection, ventes: pd.DataFrame, plateforme: str) -> 
 def importer(conn: sqlite3.Connection, chemin: Path, plateforme: str, sel: str) -> RapportImport:
     ventes = LECTEURS[plateforme](chemin, sel)
     return charger(conn, ventes, plateforme)
+
+
+def rattacher_au_catalogue(conn: sqlite3.Connection, produits: list) -> int:
+    """Copie le catalogue dans la base et remplit la référence (SKU) des ventes qui n'en ont pas.
+
+    Renvoie le nombre de ventes rattachées. Une vente qu'on ne sait pas rattacher garde un SKU
+    vide : elle reste visible, pour qu'on complète le catalogue plutôt que de la perdre.
+    """
+    from gemmw.catalogue import Index
+
+    conn.executemany(
+        "INSERT INTO produit (sku, livret, format, prix_eur, age) VALUES (?,?,?,?,?) "
+        "ON CONFLICT(sku) DO UPDATE SET livret=excluded.livret, format=excluded.format, "
+        "prix_eur=excluded.prix_eur, age=excluded.age",
+        [(p.sku, p.livret, p.format, p.prix_eur, p.age) for p in produits],
+    )
+    index = Index(produits)
+    rattachees = 0
+    a_traiter = conn.execute(
+        "SELECT id, plateforme, produit FROM vente WHERE sku IS NULL"
+    ).fetchall()
+    for id_vente, plateforme, produit in a_traiter:
+        sku = index.sku(plateforme, produit)
+        if sku:
+            conn.execute("UPDATE vente SET sku = ? WHERE id = ?", (sku, id_vente))
+            rattachees += 1
+    conn.commit()
+    return rattachees

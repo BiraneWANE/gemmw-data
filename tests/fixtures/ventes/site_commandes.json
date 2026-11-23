@@ -1,0 +1,18 @@
+[
+ {"id": 2001, "status": "completed", "date_created": "2026-11-20T10:12:00", "date_paid": "2026-11-20T10:13:00",
+  "total": "5.90", "total_tax": "0.00", "billing": {"email": "Lea.Test@example.org", "country": "FR"},
+  "line_items": [{"product_id": 1021, "sku": "GEMMW-INVARIABLES-01", "total": "5.90"}]},
+ {"id": 2002, "status": "processing", "date_created": "2026-11-21T08:00:00", "date_paid": "2026-11-21T08:01:00",
+  "total": "36.80", "total_tax": "0.00", "billing": {"email": "lea.test@example.org", "country": "BE"},
+  "line_items": [{"product_id": 194, "sku": "GEMMW-AVENT-PAP", "total": "29.90"}]},
+ {"id": 2003, "status": "completed", "date_created": "2026-11-21T09:00:00", "date_paid": null,
+  "total": "0.00", "total_tax": "0.00", "billing": {"email": "offert@example.org", "country": "FR"},
+  "line_items": [{"product_id": 1023, "sku": "GEMMW-MOTSDOUX-01", "total": "0.00"}]},
+ {"id": 2004, "status": "refunded", "date_created": "2026-11-22T09:00:00", "date_paid": "2026-11-22T09:01:00",
+  "total": "5.90", "total_tax": "0.00", "billing": {"email": "rembourse@example.org", "country": "FR"},
+  "line_items": [{"product_id": 34, "sku": "GEMMW-COULEURS-01", "total": "5.90"}]},
+ {"id": 2005, "status": "completed", "date_created": "2026-11-22T11:00:00", "date_paid": "2026-11-22T11:01:00",
+  "total": "11.80", "total_tax": "0.00", "billing": {"email": "panier@example.org", "country": "FR"},
+  "line_items": [{"product_id": 33, "sku": "GEMMW-AUTOMNE-01", "total": "5.90"},
+                 {"product_id": 34, "sku": "GEMMW-COULEURS-01", "total": "5.90"}]}
+]

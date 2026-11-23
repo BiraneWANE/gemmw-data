@@ -4,7 +4,7 @@
 
 **Prix concurrents.** Des pages publiques de boutiques, relevées une fois par semaine avec un User-Agent identifiable et deux secondes entre chaque requête. Aucune donnée personnelle. Le `robots.txt` de chaque site est respecté ; un site qui refuse les robots sort de la liste.
 
-**Ventes.** Les exports Payhip et Etsy contiennent l'email de l'acheteuse. Il ne rentre jamais dans l'entrepôt : à l'import, il est remplacé par un haché SHA-256 salé, qui permet de reconnaître une cliente qui revient sans afficher qui elle est. C'est une donnée pseudonymisée et non anonyme : le détenteur du sel peut refaire le lien, donc le RGPD s'applique toujours. Le sel est un secret hors dépôt. Les exports bruts restent sur le poste de travail, dans un dossier ignoré par git, et sont supprimés après import.
+**Ventes.** Les exports Payhip et Etsy, et les commandes du site (WooCommerce, lues avec une clé d'API en lecture seule), contiennent l'email de l'acheteuse. Il ne rentre jamais dans l'entrepôt : à l'import, il est remplacé par un haché SHA-256 salé, qui permet de reconnaître une cliente qui revient sans afficher qui elle est. C'est une donnée pseudonymisée et non anonyme : le détenteur du sel peut refaire le lien, donc le RGPD s'applique toujours. Le sel est un secret hors dépôt. Les exports bruts restent sur le poste de travail, dans un dossier ignoré par git, et sont supprimés après import.
 
 **Prénoms pour le générateur.** Le prénom de l'enfant arrive par la commande et sert à produire le PDF. Le générateur ne garde rien ; la boutique garde le PDF 30 jours pour le téléchargement, et le prénom seulement dans la commande. Il n'est pas un identifiant.
 

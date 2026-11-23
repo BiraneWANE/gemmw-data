@@ -1,0 +1,128 @@
+# Catalogue commun Gem'MW : une seule référence (SKU) par livret et par format,
+# reliée à sa fiche sur chaque plateforme. C'est la source de vérité pour rattacher
+# une vente à un livret, quelle que soit la boutique où elle a eu lieu.
+#
+# Mettre à jour à chaque nouveau livret ou changement de prix (relevé du 23/11/2026).
+# Champs : sku, livret, format (pdf | plastifie | kit), prix_eur, age,
+# site_id (WooCommerce famillemw.fr), payhip (code de la fiche), payhip_titre,
+# etsy (identifiant de fiche, vide si pas sur Etsy).
+
+[[produit]]
+sku = "GEMMW-AUTOMNE-01"
+livret = "Mon premier imagier de l'automne avec Talo"
+format = "pdf"
+prix_eur = 5.90
+age = "dès 2 ans"
+site_id = 33
+payhip = "UCPiv"
+payhip_titre = "Mon premier imagier de l'automne avec Talo | Livret à imprimer, dès 2 ans"
+etsy = "4577051620"
+
+[[produit]]
+sku = "GEMMW-AUTOMNE-PAP"
+livret = "Mon premier imagier de l'automne avec Talo"
+format = "plastifie"
+prix_eur = 29.90
+age = "dès 2 ans"
+site_id = 95
+
+[[produit]]
+sku = "GEMMW-COULEURS-01"
+livret = "Mes premières couleurs avec Talo"
+format = "pdf"
+prix_eur = 5.90
+age = "dès 2 ans"
+site_id = 34
+payhip = "X0nKB"
+payhip_titre = "Mes premières couleurs avec Talo, dès 2 ans (PDF à imprimer)"
+etsy = "4577084211"
+
+[[produit]]
+sku = "GEMMW-COULEURS-PAP"
+livret = "Mes premières couleurs avec Talo"
+format = "plastifie"
+prix_eur = 29.90
+age = "dès 2 ans"
+site_id = 96
+payhip = "9Y5CB"
+payhip_titre = "Mes premières couleurs avec Talo, dès 2 ans (livret plastifié envoyé chez toi)"
+
+[[produit]]
+sku = "GEMMW-COMPTE-01"
+livret = "Je compte et je joue avec Talo"
+format = "pdf"
+prix_eur = 5.90
+age = "dès 2 ans"
+site_id = 111
+payhip = "FKdUt"
+payhip_titre = "Je compte et je joue avec Talo, mon premier livret pour compter jusqu'à 3 (dès 2 ans) + coloriage offert"
+etsy = "4610140244"
+
+[[produit]]
+sku = "GEMMW-COMPTE-PAP"
+livret = "Je compte et je joue avec Talo"
+format = "plastifie"
+prix_eur = 29.90
+age = "dès 2 ans"
+site_id = 112
+
+[[produit]]
+sku = "GEMMW-AVENT-01"
+livret = "Mon calendrier de l'Avent avec Talo"
+format = "pdf"
+prix_eur = 5.90
+age = "dès 2 ans"
+site_id = 193
+payhip = "nUSYE"
+payhip_titre = "Mon calendrier de l'Avent avec Talo : 24 activités de gommettes dès 2 ans (PDF à imprimer)"
+etsy = "4613299940"
+
+[[produit]]
+sku = "GEMMW-AVENT-PAP"
+livret = "Mon calendrier de l'Avent avec Talo"
+format = "kit"
+prix_eur = 29.90
+age = "dès 2 ans"
+site_id = 194
+payhip = "6C2ZY"
+payhip_titre = "Mon calendrier de l'Avent avec Talo : kit plastifié + gommettes, dès 2 ans (envoyé chez toi)"
+
+[[produit]]
+sku = "GEMMW-INVARIABLES-01"
+livret = "Mes mots invariables avec Talo"
+format = "pdf"
+prix_eur = 5.90
+age = "CP et CE1"
+site_id = 1021
+payhip = "nsAqU"
+payhip_titre = "Mes mots invariables avec Talo, 30 mots à savoir écrire en CP et CE1 (PDF à imprimer)"
+etsy = "4615910007"
+
+[[produit]]
+sku = "GEMMW-INVARIABLES-PAP"
+livret = "Mes mots invariables avec Talo"
+format = "plastifie"
+prix_eur = 29.90
+age = "CP et CE1"
+site_id = 1022
+payhip = "5dsRm"
+payhip_titre = "Mes mots invariables avec Talo, CP et CE1 (livret plastifié et relié)"
+
+[[produit]]
+sku = "GEMMW-MOTSDOUX-01"
+livret = "50 petits mots doux à glisser partout"
+format = "pdf"
+prix_eur = 0.0
+age = "tout âge"
+site_id = 1023
+payhip = "zH5NK"
+payhip_titre = "50 petits mots doux à glisser partout, offerts (PDF à imprimer)"
+
+[[produit]]
+sku = "GEMMW-RESTO-01"
+livret = "Mon kit resto avec Talo"
+format = "pdf"
+prix_eur = 0.0
+age = "dès 2 ans"
+payhip = "U8cCg"
+payhip_titre = "Mon kit resto avec Talo, offert (dès 2 ans)"

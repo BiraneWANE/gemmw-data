@@ -48,10 +48,17 @@ def lire_ventes(chemin_db: Path) -> pd.DataFrame:
                 "tva_eur",
                 "acheteuse_hash",
                 "pays",
+                "sku",
+                "livret",
+                "format",
             ]
         )
     with sqlite3.connect(chemin_db) as conn:
-        df = pd.read_sql_query("SELECT * FROM vente ORDER BY vendue_le", conn)
+        df = pd.read_sql_query(
+            "SELECT v.*, p.livret, p.format FROM vente v LEFT JOIN produit p ON p.sku = v.sku "
+            "ORDER BY v.vendue_le",
+            conn,
+        )
     df["vendue_le"] = pd.to_datetime(df["vendue_le"]).dt.date
     df["net_eur"] = (df["prix_ttc_eur"] - df["frais_eur"] - df["tva_eur"]).round(2)
     return df
@@ -68,3 +75,26 @@ def resume_ventes(ventes: pd.DataFrame) -> dict:
         "clientes": int(par_cliente.size),
         "retour": int((par_cliente > 1).sum()),
     }
+
+
+def ventes_par_livret(ventes: pd.DataFrame) -> pd.DataFrame:
+    """Ventes regroupées par livret, toutes boutiques confondues (grâce au catalogue commun).
+
+    Les ventes qu'on n'a pas su rattacher apparaissent sous « (à rattacher) » : c'est le
+    signal qu'il manque un livret ou un titre dans le catalogue.
+    """
+    if ventes.empty:
+        return pd.DataFrame(columns=["livret", "format", "commandes", "net_eur", "boutiques"])
+    df = ventes.assign(
+        livret=ventes["livret"].fillna("(à rattacher)"), format=ventes["format"].fillna("")
+    )
+    return (
+        df.groupby(["livret", "format"], as_index=False)
+        .agg(
+            commandes=("commande_ref", "count"),
+            net_eur=("net_eur", "sum"),
+            boutiques=("plateforme", lambda s: ", ".join(sorted(set(s)))),
+        )
+        .sort_values("net_eur", ascending=False)
+        .reset_index(drop=True)
+    )

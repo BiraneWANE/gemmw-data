@@ -16,6 +16,7 @@ from gemmw.tableau_de_bord.donnees import (
     lire_releves,
     lire_ventes,
     resume_ventes,
+    ventes_par_livret,
 )
 
 RACINE = Path(__file__).resolve().parents[3]
@@ -41,7 +42,7 @@ c5.metric("Clientes revenues", r["retour"])
 if ventes.empty:
     st.info(
         "Aucune vente dans l'entrepôt pour l'instant. Importer un export avec "
-        "`uv run python -m gemmw.cli importer <fichier.csv> --plateforme payhip|etsy`."
+        "`uv run python -m gemmw.cli importer <fichier> --plateforme payhip|etsy|site`."
     )
 else:
     par_semaine = (
@@ -56,7 +57,12 @@ else:
         color="plateforme",
         barmode="group",
         labels={"semaine": "Semaine", "net": "Net (€)", "plateforme": "Plateforme"},
-        color_discrete_map={"payhip": "#2a78d6", "etsy": "#eb6834", "amazon": "#eda100"},
+        color_discrete_map={
+            "payhip": "#2a78d6",
+            "etsy": "#eb6834",
+            "amazon": "#eda100",
+            "site": "#3f7d45",
+        },
     )
     fig.update_layout(margin={"t": 10, "l": 0, "r": 0, "b": 0}, legend_title_text="")
     st.plotly_chart(fig, use_container_width=True)
@@ -69,6 +75,8 @@ else:
     )
     marge["net par commande (€)"] = (marge["net"] / marge["commandes"]).round(2)
     st.dataframe(marge, hide_index=True, use_container_width=True)
+    st.subheader("Par livret, toutes boutiques confondues")
+    st.dataframe(ventes_par_livret(ventes), hide_index=True, use_container_width=True)
 
 # ---- Prix concurrents ----------------------------------------------------------------------
 st.header("Les prix concurrents")

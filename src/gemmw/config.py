@@ -24,6 +24,10 @@ class Settings(BaseSettings):
         "imagier enfant pdf",
         "cahier activités maternelle pdf",
     )
+    # Boutique du site (WooCommerce) : clé d'API en lecture seule, pour importer les commandes.
+    wc_url: str = "https://famillemw.fr"
+    wc_cle: str = ""
+    wc_secret: str = ""
     # Alerte de prix sur Telegram (facultatif).
     telegram_bot_token: str = Field(
         "", validation_alias=AliasChoices("GEMMW_TELEGRAM_BOT_TOKEN", "TELEGRAM_BOT_TOKEN")

@@ -23,5 +23,15 @@ CREATE TABLE IF NOT EXISTS vente (
     tva_eur         REAL NOT NULL DEFAULT 0,
     acheteuse_hash  TEXT NOT NULL,
     pays            TEXT,
+    sku             TEXT,  -- référence du catalogue commun, remplie après import
     UNIQUE (plateforme, commande_ref)
+);
+
+-- Catalogue commun (copie de src/gemmw/catalogue/produits.toml) : une ligne par livret et format.
+CREATE TABLE IF NOT EXISTS produit (
+    sku         TEXT PRIMARY KEY,
+    livret      TEXT NOT NULL,
+    format      TEXT NOT NULL CHECK (format IN ('pdf', 'plastifie', 'kit')),
+    prix_eur    REAL NOT NULL CHECK (prix_eur >= 0),
+    age         TEXT NOT NULL DEFAULT ''
 );

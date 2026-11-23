@@ -21,7 +21,7 @@ def collecte(sortie: Path = Path("data/brut")) -> None:  # noqa: B008
 @app.command()
 def importer(
     fichier: Path,
-    plateforme: str = typer.Option(..., help="payhip ou etsy"),
+    plateforme: str = typer.Option(..., help="payhip, etsy ou site"),
     verifier_seulement: bool = typer.Option(False, help="Contrôler sans charger"),
 ) -> None:
     """Importe un export CSV de ventes dans l'entrepôt, après contrôles d'entrée."""
@@ -49,11 +49,46 @@ def importer(
     if verifier_seulement:
         typer.echo(f"{len(ventes)} vente(s) valides, non chargées (vérification seulement).")
         return
-    rapport = charger(ouvrir(settings.db_path), ventes, plateforme)
+    from gemmw.catalogue import charger as charger_catalogue
+    from gemmw.entrepot.ventes import rattacher_au_catalogue
+
+    conn = ouvrir(settings.db_path)
+    rapport = charger(conn, ventes, plateforme)
+    rattachees = rattacher_au_catalogue(conn, charger_catalogue())
     typer.echo(
         f"{rapport.plateforme} : {rapport.lues} lues, {rapport.inserees} nouvelles, "
-        f"{rapport.ignorees} déjà connues."
+        f"{rapport.ignorees} déjà connues, {rattachees} rattachée(s) au catalogue."
     )
+
+
+@app.command("commandes-site")
+def commandes_site(sortie: Path = Path("data/brut")) -> None:  # noqa: B008
+    """Télécharge les commandes de la boutique du site (à importer ensuite avec `importer`)."""
+    from gemmw.collecte.woocommerce import ecrire, recuperer_commandes
+    from gemmw.config import settings
+
+    if not (settings.wc_cle and settings.wc_secret):
+        typer.echo("GEMMW_WC_CLE et GEMMW_WC_SECRET manquants dans .env.")
+        raise typer.Exit(code=2)
+    chemin = ecrire(
+        recuperer_commandes(settings.wc_url, settings.wc_cle, settings.wc_secret), sortie
+    )
+    typer.echo(f"Commandes écrites : {chemin} (puis : gemmw importer {chemin} --plateforme site)")
+
+
+@app.command()
+def catalogue() -> None:
+    """Vérifie le catalogue commun et affiche, pour chaque livret, où il est en vente."""
+    from gemmw.catalogue import CatalogueInvalide, charger
+
+    try:
+        produits = charger()
+    except CatalogueInvalide as e:
+        typer.echo(f"Catalogue invalide : {e}")
+        raise typer.Exit(code=1) from e
+    for p in produits:
+        ou = [n for n, v in (("site", p.site_id), ("payhip", p.payhip), ("etsy", p.etsy)) if v]
+        typer.echo(f"{p.sku:<24} {p.format:<10} {p.prix_eur:>6.2f} €  {', '.join(ou)}")
 
 
 @app.command("controle-releve")
