@@ -22,8 +22,8 @@ terraform apply -var "cle_ssh_publique=$(cat ~/.ssh/id_ed25519.pub)" -var "ip_ad
 
 1. Dans cPanel o2switch > Zone DNS : enregistrement A `generateur` vers l'`ip_publique` affichée.
 2. Sur le serveur : ajouter `GEMMW_API_CLE=...` dans `/opt/gemmw/.env`.
-3. Copier les livrets : `scp livrets/*.pdf root@IP:/srv/gemmw/livrets/`.
-4. `cd /opt/gemmw && docker compose up -d --build`, puis vérifier `https://generateur.gemmw.fr/sante`.
+3. Copier les livrets et la police : `scp livrets/*.pdf root@IP:/srv/gemmw/livrets/` puis `scp Fredoka-SemiBold.ttf root@IP:/srv/gemmw/polices/` (dans « 03 Marque/Polices »).
+4. `cd /opt/gemmw && docker compose up -d --build`, puis vérifier `https://generateur.famillemw.fr/sante`.
 
 Les clés et les livrets ne passent jamais par Terraform ni par GitHub.
 

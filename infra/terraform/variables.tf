@@ -35,7 +35,7 @@ variable "ip_admin" {
 variable "domaine" {
   description = "Sous-domaine du générateur, à faire pointer sur l'IP du serveur"
   type        = string
-  default     = "generateur.gemmw.fr"
+  default     = "generateur.famillemw.fr"
 }
 
 variable "depot" {

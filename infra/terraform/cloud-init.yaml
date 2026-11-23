@@ -17,7 +17,7 @@ write_files:
       # Ajouter ici GEMMW_API_CLE=... après la création (jamais dans Terraform)
 
 runcmd:
-  - mkdir -p /srv/gemmw/livrets /srv/gemmw/caddy
+  - mkdir -p /srv/gemmw/livrets /srv/gemmw/polices /srv/gemmw/caddy
   - curl -fsSL https://get.docker.com | sh
   - systemctl enable --now docker
   - sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config

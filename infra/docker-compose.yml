@@ -7,8 +7,11 @@ services:
     environment:
       GEMMW_API_CLE: ${GEMMW_API_CLE}
       GEMMW_LIVRETS_DIR: /livrets
+      # Police du livret (Fredoka SemiBold, licence OFL) : le prénom a le même style que le texte
+      GEMMW_POLICE: /polices/Fredoka-SemiBold.ttf
     volumes:
       - /srv/gemmw/livrets:/livrets:ro
+      - /srv/gemmw/polices:/polices:ro
     expose: ["8000"]
 
   caddy:
